@@ -10,6 +10,19 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
 from anticaptchaofficial.recaptchav2proxyless import *
+from termcolor import colored, cprint
+import logging
+
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("debug.log"),
+        logging.StreamHandler()
+    ]
+)
 
 
 chrome_driver_path = "C:/SeleniumDrivers/chromedriver.exe"
@@ -38,8 +51,8 @@ option.add_argument("--disable-popup-blocking")
 global browser
 global service_path
 
-booking_time_offer_1 = '10:00'
-booking_time_offer_2 = '10:30'
+booking_time_offer_1 = '09:00'
+booking_time_offer_2 = '11:00'
 
 counrty_field_one = 'India'
 counrty_field_two = 'India'
@@ -53,7 +66,7 @@ def error_handler(exctype, value, traceback):
     # This function will be called whenever an error occurs
 
     # Print the error message
-    print(f"Error--A: {value}")
+    logging.error(f"Error--A: {value}")
 
     # You can perform additional actions here, such as logging the error
 
@@ -66,18 +79,20 @@ sys.excepthook = error_handler
 def open_browser():
     global browser
     global service_path
-    print('Open Browser function, executed')
+    # terminal_text = colored('Open Browser function, executed', 'green', attrs=['bold'])
+    # print(terminal_text)
+    logging.info('Open Browser function, executed')
     service_path = Service(executable_path=chrome_driver_path)
     browser = webdriver.Chrome(service=service_path, options=option)
     browser.get("https://otv.verwalt-berlin.de/ams/TerminBuchen?lang=en")
 
 
 def main_process():
-    print('Waiting for Book Appointment btn ...')   
+    logging.info('Waiting for Book Appointment btn ...')   
     WebDriverWait(browser, 20).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'a[href="/ams/TerminBuchen/wizardng?sprachauswahl=en"]'), 'Book Appointment'))
     browser.implicitly_wait(3)
     browser.find_element(By.CSS_SELECTOR, 'a[href="/ams/TerminBuchen/wizardng?sprachauswahl=en"]').click()
-    print('Book Appointment btn passed') 
+    logging.info('Book Appointment btn passed') 
 
     # CheckBox Mark and Next Buttom 
 
@@ -87,7 +102,7 @@ def main_process():
     browser.implicitly_wait(10)
     next_btn = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
     next_btn.click()
-    print('CheckBox marked and the next buttom clicked')
+    logging.info('CheckBox marked and the next buttom clicked')
 
     # The information page related to specifying the nationality and type of application   
 
@@ -100,7 +115,7 @@ def main_process():
     # Iran, Islamic Republic
     # India
     select1.select_by_visible_text('India')
-    print("India")
+    logging.info("India")
 
     time.sleep(0.3)
 
@@ -112,7 +127,7 @@ def main_process():
     # one person
     # three people
     select2.select_by_visible_text('three people')
-    print('three people')
+    logging.info('three people')
 
     time.sleep(0.3)
 
@@ -122,7 +137,7 @@ def main_process():
     time.sleep(0.3)
     select3 = Select(element_dropdown3)
     select3.select_by_visible_text('yes')
-    print('yes')
+    logging.info('yes')
 
     time.sleep(0.3)
 
@@ -134,7 +149,7 @@ def main_process():
     # Iran, Islamic Republic
     # India
     select4.select_by_visible_text('India')
-    print('India')
+    logging.info('India')
 
     time.sleep(0.3)
 
@@ -145,7 +160,7 @@ def main_process():
     apply_residence = browser.find_element(By.CLASS_NAME, 'kachel-436-0-2')
     browser.implicitly_wait(3)
     apply_residence.click()
-    print('Extend a residence title')
+    logging.info('Extend a residence title')
     time.sleep(0.3)
     # accordion-439-0-1-4 ---> Family reasons
     # accordion-436-0-2-1 ---> Economic activity
@@ -153,7 +168,7 @@ def main_process():
     family_reasons = browser.find_element(By.CLASS_NAME, 'accordion-436-0-2-1')
     browser.implicitly_wait(3)
     family_reasons.click()
-    print('Economic activity')
+    logging.info('Economic activity')
 
     time.sleep(1)
     # SERVICEWAHL_EN439-0-1-4-327471 ---> Residence permit for spouses and children of skilled workers, students, trainees, scientists and teachers (sect. 29-32)
@@ -162,7 +177,7 @@ def main_process():
     student = browser.find_element(By.ID, 'SERVICEWAHL_EN436-0-2-1-329328')
     browser.implicitly_wait(3)
     student.click()
-    print('18b, para 1 - has been selected')
+    logging.info('18b, para 1 - has been selected')
     # browser.implicitly_wait(30)
 
     time.sleep(15)
@@ -170,7 +185,7 @@ def main_process():
     browser.implicitly_wait(3)
     next_btn = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
     next_btn.click()
-    print('Next buttom Clicked')
+    logging.info('Next buttom Clicked')
 
 
 def service_selection():    
@@ -178,16 +193,17 @@ def service_selection():
         EC.text_to_be_present_in_element(
             (By.CSS_SELECTOR, "fieldset[id='xi-fs-2'] legend"), 'Appointment selection')
     )
-    print("Service selection page is loaded completely")
-
+    # terminal_text = colored('Service selection page is loaded completely', 'yellow', attrs=['reverse', 'bold'])
+    # print(terminal_text)
+    logging.info('*** Service selection page is loaded completely ***')
 
 def recaptcha_solver():
     get_url = browser.current_url
-    print("The current url is:"+str(get_url))
+    logging.info("The current url is:"+str(get_url))
 
     sitekey = browser.find_element(By.XPATH, '//*[@id="xi-div-4"]').get_attribute('outerHTML')
     sitekey_clean = sitekey.split('" data-xm-appendable')[0].split('data-sitekey="')[1]
-    print(sitekey_clean)
+    logging.info(sitekey_clean)
 
     solver = recaptchaV2Proxyless()
     solver.set_verbose(1)
@@ -197,16 +213,16 @@ def recaptcha_solver():
 
     g_response = solver.solve_and_return_solution()
     if g_response!= 0:
-        print("g_response"+g_response)
+        logging.info("g_response"+g_response)
     else:
-        print("task finished with error"+solver.error_code)
+        logging.info("task finished with error"+solver.error_code)
 
     browser.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display-"";')
-    time.sleep(0.5)
+    time.sleep(0.1)
     browser.execute_script("""document.getElementById("g-recaptcha-response").innerHTML = arguments[0]""", g_response)
-    time.sleep(0.5)
+    time.sleep(0.1)
     browser.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
-    time.sleep(0.5)
+    time.sleep(0.1)
     #browser.find_element(By.XPATH, '//*[@id="recaptcha-demo-submit"]').click()
 
 
@@ -218,10 +234,10 @@ def date_time_selection():
         select_day = browser.find_element(By.XPATH, '//td[@data-handler="selectDay"]')
         select_month = browser.find_element(By.XPATH, '//*[@id="xi-div-2"]/div/div[1]/div/div/span')
         browser.implicitly_wait(3)
-        print(f'The selected date is {select_day.text} {select_month.text} day of the month')
+        logging.info(f'The selected date is {select_day.text} {select_month.text} day of the month')
         select_day.click()
     except NoSuchElementException:
-        print('We got to the date selection page, but unfortunately there are no dates to choose from.')
+        logging.info('We got to the date selection page, but unfortunately there are no dates to choose from.')
         browser.quit()
         open_browser()
         main_process()
@@ -232,21 +248,22 @@ def date_time_selection():
     # try:
     for i in range(600):  # Create Time Delay for open the page complete
         if not (dropdown_menu_is_open.text == 'Please select'):
-            print("The (Time selection) part is loaded completely now.", " ", "After", {(i+1) * 0.1}, "Second")
+            logging.info(f'The (Time selection) part is loaded completely now. After {(i+1) * 0.1} Second')
             break
         else:
-            print(i)
+            logging.info(i)
     time.sleep(0.1)
 
     dropdown_menu = Select(browser.find_element(By.ID, 'xi-sel-3'))
     for option in dropdown_menu.options:
-        print(option.text, option.get_attribute('value'))
+        # print(option.text, option.get_attribute('value'))
+        logging.info(option.text)
         if option.text == booking_time_offer_1:
             break
         elif option.text == booking_time_offer_2:
             break
 
-    print(f'Selected booking time is {option.text}')
+    logging.info(f'Selected booking time is {option.text}')
     dropdown_menu.select_by_visible_text(option.text)
     
     #Recaptcha
@@ -303,10 +320,14 @@ while is_loop == 'true':
     except Exception as e:
     # The error handler function will be automatically called here
         i+=1
-        print(f"Unfortunately the Date is unavailable\nRepeated", {i}, "times") 
+        #print(f"Unfortunately the Date is unavailable\nRepeated", {i}, "times")
+        logging.warning('Unfortunately the Date is unavailable')
+        logging.info(f'{i} attempts')  
+        #Repeated", {i}, "times"           
+        #logging.error('Something bad happened') 
         #is_loop = 'false'   
         browser.quit()
         pass  # Or you can choose to handle the error further if needed
 
 
-print('--Congratulations! your booking has been done successfully--')
+logging.info('--Congratulations! your booking has been done successfully--')
