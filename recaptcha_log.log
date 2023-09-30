@@ -1,0 +1,72 @@
+2023-07-01 23:16:36,911 [INFO] ====== WebDriver manager ======
+2023-07-01 23:16:37,462 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-01 23:16:39,510 [INFO] start
+2023-07-01 23:17:42,139 [INFO] solved
+2023-07-01 23:20:25,896 [INFO] ====== WebDriver manager ======
+2023-07-01 23:20:26,437 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-01 23:20:28,160 [INFO] start
+2023-07-01 23:21:39,838 [INFO] solved
+2023-07-02 10:08:37,356 [INFO] ====== WebDriver manager ======
+2023-07-02 10:08:38,326 [INFO] Get LATEST chromedriver version for google-chrome
+2023-07-02 10:08:38,591 [INFO] About to download new driver from https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_win32.zip
+2023-07-02 10:08:39,882 [INFO] Driver has been saved in cache [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90]
+2023-07-02 10:08:42,676 [INFO] start
+2023-07-02 10:09:20,328 [INFO] solved
+2023-07-02 10:11:46,505 [INFO] ====== WebDriver manager ======
+2023-07-02 10:11:47,077 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 10:11:49,002 [INFO] start
+2023-07-02 10:12:50,051 [INFO] solved
+2023-07-02 10:13:59,198 [INFO] ====== WebDriver manager ======
+2023-07-02 10:13:59,787 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 10:14:01,703 [INFO] start
+2023-07-02 10:15:10,748 [INFO] solved
+2023-07-02 12:24:36,476 [INFO] Applicable driver not found; attempting to install with Selenium Manager (Beta)
+2023-07-02 12:25:47,209 [INFO] ====== WebDriver manager ======
+2023-07-02 12:25:48,193 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 12:27:11,745 [INFO] ====== WebDriver manager ======
+2023-07-02 12:27:12,312 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 12:27:49,590 [INFO] ====== WebDriver manager ======
+2023-07-02 12:27:50,132 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 14:41:56,556 [INFO] ====== WebDriver manager ======
+2023-07-02 14:41:57,122 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 14:43:24,082 [INFO] ====== WebDriver manager ======
+2023-07-02 14:43:24,611 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 14:45:06,231 [INFO] ====== WebDriver manager ======
+2023-07-02 14:45:06,770 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 14:45:27,570 [INFO] ====== WebDriver manager ======
+2023-07-02 14:45:28,183 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 15:15:06,753 [INFO] ====== WebDriver manager ======
+2023-07-02 15:15:07,341 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 15:18:05,604 [INFO] ====== WebDriver manager ======
+2023-07-02 15:18:06,182 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 15:18:46,409 [INFO] ====== WebDriver manager ======
+2023-07-02 15:18:46,981 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 15:22:45,227 [INFO] ====== WebDriver manager ======
+2023-07-02 15:22:46,028 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 15:23:16,192 [INFO] ====== WebDriver manager ======
+2023-07-02 15:23:16,766 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 15:23:39,029 [INFO] ====== WebDriver manager ======
+2023-07-02 15:23:39,658 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 22:30:42,488 [INFO] ====== WebDriver manager ======
+2023-07-02 22:30:43,262 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 22:36:09,245 [INFO] ====== WebDriver manager ======
+2023-07-02 22:36:09,952 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 22:41:37,422 [INFO] ====== WebDriver manager ======
+2023-07-02 22:41:38,128 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 22:44:32,596 [INFO] ====== WebDriver manager ======
+2023-07-02 22:44:33,140 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 22:45:30,439 [INFO] ====== WebDriver manager ======
+2023-07-02 22:45:31,011 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 22:51:46,408 [INFO] ====== WebDriver manager ======
+2023-07-02 22:51:47,016 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-02 22:54:37,318 [INFO] ====== WebDriver manager ======
+2023-07-02 22:54:37,935 [INFO] Driver [C:\Users\Milad Shahabi\.wdm\drivers\chromedriver\win32\114.0.5735.90\chromedriver.exe] found in cache
+2023-07-19 22:59:34,657 [INFO] ====== WebDriver manager ======
+2023-07-19 22:59:37,457 [INFO] There is no [win32] chromedriver "latest" for browser google-chrome "115.0.5790" in cache
+2023-07-19 22:59:37,457 [INFO] Get LATEST chromedriver version for google-chrome
+2023-07-19 23:00:16,536 [INFO] ====== WebDriver manager ======
+2023-07-19 23:00:18,542 [INFO] There is no [win32] chromedriver "latest" for browser google-chrome "115.0.5790" in cache
+2023-07-19 23:00:18,543 [INFO] Get LATEST chromedriver version for google-chrome
+2023-07-19 23:11:22,851 [INFO] ====== WebDriver manager ======
+2023-07-19 23:11:25,116 [INFO] There is no [win32] chromedriver "latest" for browser google-chrome "115.0.5790" in cache
+2023-07-19 23:11:25,116 [INFO] Get LATEST chromedriver version for google-chrome

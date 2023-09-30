@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
-from anticaptchaofficial.recaptchav2enterpriseproxyon import *
+from anticaptchaofficial.recaptchav2proxyless import *
 from country_selector import id_selector
 from termcolor import colored, cprint
 from typing import Final
@@ -21,18 +21,20 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("/usr/scr/app/debug.log"),
+        logging.FileHandler("debug.log"),
         logging.StreamHandler()
     ]
 )
 
 # Initialize the bot with your bot token
-bot_token = "5889078485:AAEe7G8zffK0ZVVBt0gQBcmi_yWm_zjZ7Yg"
+bot_token_status_gmt_bot: Final = "5889078485:AAEe7G8zffK0ZVVBt0gQBcmi_yWm_zjZ7Yg"
+#bot_token_mydreams20: Final = "5796108934:AAFH4J0IFNo5eGSiiyhqsh7oB93UHaY3iUY"
 BOT_USERNAME: Final = '@Status_GMT_Bot'
-bot = telebot.TeleBot(bot_token)
+bot = telebot.TeleBot(bot_token_status_gmt_bot)
 
 ADMIN_USER_ID: Final = 5355774833  # Admin's user ID
 group_chat_id: Final = -1001636295549
+channel_chat_id: Final = -1001826497482
 
 
 
@@ -43,11 +45,12 @@ chrome_driver_path = "/usr/local/bin/chromedriver" # linux
 option = Options()
 option.page_load_strategy = 'normal'
 option.add_argument('--headless') # VPS Mode
-option.add_argument('--disable-gpu')  # Last I checked this was necessary. # VPS Mode
+#option.add_argument('--disable-gpu')  # Last I checked this was necessary. # VPS Mode
 option.add_argument('--no-sandbox') # VPS Mode
 option.add_argument('--disable-dev-shm-usage') # VPS Mode
 option.add_argument("--start-maximized")
-option.add_argument("--remote-debugging-port=9222")  # Use an arbitrary port number
+option.add_argument("--window-size=4320,7680") # we use it only for screenshot 
+#option.add_argument("--remote-debugging-port=9222")  # Use an arbitrary port number
 option.add_experimental_option("detach", False)  # Keep the browser window open after exiting the script
 option.add_argument('--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"')
 
@@ -65,24 +68,52 @@ option.add_argument("--disable-popup-blocking")
 browser = None
 service_path = None
 
-booking_time_offer_1 = '09:00'
+
+booking_time_offer_1 = '08:00'
 booking_time_offer_2 = '09:30'
 
+booking_month_1st = 'June'
+booking_month_2nd = 'July'
+booking_month_3rd = 'August'
 
+
+firstname = 'Mohammadreza'
+lastname = 'Dadashzadeh'
+dob = '31.05.1990' # DD.MM.YYYY
+email = 'mrdrmrd@gmail.com'
 citizenship = "Iran, Islamic Republic"
-nr_applicants = 'three people'
+nr_applicants = 'two people'
 with_family_live = 'yes'
 family_citizenship = 'Iran, Islamic Republic'
 residence_title = "Extend a residence title"
+id_card_number = 'A59681672'
 category = "Educational purposes"
 request_type = "Residence permit for the purpose of studying (sect. 16b)"
-firstname = 'Azadeh'
-lastname = 'Marandi'
-dob = '02.12.1986' # DD.MM.YYYY
-email = 'azademarandi@gmail.com'
-id_card_number = 'M58567516'
+
 
 i = 0
+is_loop = 'true'
+final_status = 'true'
+emoji_check_mark = u'\U00002705'
+emoji_thanks = u'\U0001F64F'
+emoji_bot = u'\U0001F916'
+at = u'\U00000040'
+
+
+message_in_channel = (f'''{emoji_check_mark} Appointment available
+---------------------------------------------------------------
+Title: 
+{request_type}
+---------------------------------------------------------------
+{emoji_bot} If you have difficulty booking an appointment, our Telegram bot is always there to make it easy for you!
+
+Telegram bot link :
+@GetMyTermin_Bot
+---------------------------------------------------------------
+Thank you for following us.''')
+
+
+
 
 
 def error_handler(exctype, value, traceback):
@@ -93,17 +124,24 @@ def error_handler(exctype, value, traceback):
     logging.error(f"Error--A: {value}")
 
     # You can perform additional actions here, such as logging the error
-
-
 # Register the error handler function
 sys.excepthook = error_handler
 
-
-def send_message_to_admin(admin_chat_id, message):
+def send_message_to_telegram(admin_chat_id, message):
     # replace 'ADMIN_CHAT_ID' with the chat id of the admin
     bot.send_message(admin_chat_id, message, parse_mode='Markdown')
 
+def send_screenshot_to_telegram_channel(chat_id, snapshot_area, text):
+    # Identify the element to screenshot by its ID (you can use XPATH, CSS selectors, etc.)
+    snapshot_area = browser.find_element(By.ID, snapshot_area)  # Replace 'element-id' with the id of your element
+    # Screenshot the element
+    snapshot_area.screenshot('screenshot.png')
+    with open('screenshot.png', 'rb') as photo:
+        bot.send_photo(chat_id, photo)
 
+    bot.send_message(chat_id, text)
+        
+    return "Screenshot sent!"
 
 # Open Browser
 def open_browser():
@@ -116,7 +154,6 @@ def open_browser():
     browser = webdriver.Chrome(service=service_path, options=option)
     #browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=option)
     browser.get("https://otv.verwalt-berlin.de/ams/TerminBuchen?lang=en")
-
 
 def main_process():
     logging.info('Waiting for Book Appointment btn ...')
@@ -133,15 +170,14 @@ def main_process():
     browser.implicitly_wait(10)
     browser.find_element(By.ID, 'applicationForm:managedForm:proceed').click()
     logging.info('CheckBox marked and the next buttom clicked')
-
-    
+   
 # The information page related to specifying the nationality and type of application   
 def nationality_selection(arg1, arg2, arg3, arg4):
-    browser.implicitly_wait(30)
+    browser.implicitly_wait(60)
     element_dropdown1 = browser.find_element(By.ID, 'xi-sel-400')
-    time.sleep(0.3)
+    time.sleep(1)
     element_dropdown1.click()
-    time.sleep(0.3)
+    time.sleep(1)
     select1 = Select(element_dropdown1)
     # Iran, Islamic Republic
     # India
@@ -185,10 +221,14 @@ def nationality_selection(arg1, arg2, arg3, arg4):
         logging.info(arg4)
         time.sleep(0.3)
 
-
 def select_type_of_residency(arg1, arg2, arg3):
 
+    global is_loop
+    global final_status
+    is_loop_1 = 'true'
+    try_count = 0
     id_array = ['','','']
+
     for i in range(3):
         id_array[i] = id_selector(citizenship, residence_title, category, request_type)[i]
 
@@ -219,24 +259,101 @@ def select_type_of_residency(arg1, arg2, arg3):
     student.click()
     logging.info(arg3)
     # browser.implicitly_wait(30)
-
-    time.sleep(15)
-
+           
+    for i in range(120):
+        time.sleep(1)
+        loading_item = browser.find_element(By.CLASS_NAME, 'loading').get_attribute('outerHTML')
+        is_loading = loading_item.split(';">')[0].split('opacity: ')[1]
+        #logging.info(is_loading)
+        if is_loading == '1':
+            loading_time_1 = i*1
+            logging.info(f"The Loading time was {loading_time_1} secounds")
+            time.sleep(2)
+            loading_item = browser.find_element(By.CLASS_NAME, 'loading').get_attribute('outerHTML')
+            is_loading = loading_item.split(';">')[0].split('opacity: ')[1]
+            if is_loading == '1':
+                logging.info("I'm sure loading is finished")
+                break 
+    # After that the loading finished ...     
     browser.implicitly_wait(3)
-    next_btn = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
-    next_btn.click()
-    logging.info('Next buttom Clicked')
+    condition = browser.find_element(By.ID, 'messagesBox')
+    if condition.text == 'There is currently no information available for the selected service. Please try again later.':
+        logging.info(condition.text)
+        is_loop = 'false'
+        final_status = 'false'
+        raise ElementNotInteractableException
+        
 
+    if not condition.text == 'There are currently no dates available for the selected service! Please try again later.':
+        logging.info('Dates available for the selected service!')
+        browser.implicitly_wait(3)
+        next_btn = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
+        next_btn.click()
+        logging.info('Next buttom Clicked')
+
+    elif condition.text == 'There are currently no dates available for the selected service! Please try again later.':
+        while is_loop_1 == 'true': 
+            time.sleep(1)
+            browser.implicitly_wait(3)
+            apply_residence = browser.find_element(By.CLASS_NAME, id_array[0])
+            browser.implicitly_wait(3)
+            apply_residence.click()
+            logging.info(arg1)
+            time.sleep(0.3)
+
+            browser.implicitly_wait(3)
+            family_reasons = browser.find_element(By.CLASS_NAME, id_array[1])
+            browser.implicitly_wait(3)
+            family_reasons.click()
+            logging.info(arg2)
+
+            time.sleep(1)
+
+            student = browser.find_element(By.ID, id_array[2])
+            browser.implicitly_wait(3)
+            student.click()
+            logging.info(arg3)
+
+            for i in range(120):
+                time.sleep(1)
+                loading_item = browser.find_element(By.CLASS_NAME, 'loading').get_attribute('outerHTML')
+                is_loading = loading_item.split(';">')[0].split('opacity: ')[1]
+                #logging.info(is_loading)
+                if is_loading == '1':
+                    loading_time_2 = i*1
+                    logging.info(f"The Loading time was {loading_time_2} secounds")
+                    time.sleep(2)
+                    loading_item = browser.find_element(By.CLASS_NAME, 'loading').get_attribute('outerHTML')
+                    is_loading = loading_item.split(';">')[0].split('opacity: ')[1]
+                    if is_loading == '1':
+                        logging.info("I'm sure loading is finished")
+                        break 
+
+            browser.implicitly_wait(3)
+            condition = browser.find_element(By.ID, 'messagesBox')
+            if not condition.text == 'There are currently no dates available for the selected service! Please try again later.':
+                logging.info('Dates available for the selected service!')
+                time.sleep(2)
+                browser.implicitly_wait(3)
+                next_btn = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
+                next_btn.click()
+                logging.info('Next buttom Clicked')
+                is_loop_1 = 'false'
+
+            if condition.text == 'There are currently no dates available for the selected service! Please try again later.':
+                is_loop_1 = 'true'
+                logging.info('loop continue')
+                try_count += 1
+                logging.info(f'Try Count:{try_count}')
 
 def service_selection():
-    WebDriverWait(browser, 15).until(
+    WebDriverWait(browser, 120).until(
         EC.text_to_be_present_in_element(
             (By.CSS_SELECTOR, "fieldset[id='xi-fs-2'] legend"), 'Appointment selection')
     )
     # terminal_text = colored('Service selection page is loaded completely', 'yellow', attrs=['reverse', 'bold'])
     # print(terminal_text)
     logging.info('*** Service selection page is loaded completely ***')
-
 
 def recaptcha_solver():
     get_url = browser.current_url
@@ -247,7 +364,7 @@ def recaptcha_solver():
     sitekey_clean = sitekey.split('" data-xm-appendable')[0].split('data-sitekey="')[1]
     logging.info(sitekey_clean)
 
-    solver = recaptchaV2EnterpriseProxyon()
+    solver = recaptchaV2Proxyless()
     solver.set_verbose(1)
     solver.set_key('67104f9c4d1f29804f41b9d37a30d3e7')
     solver.set_website_url(get_url)
@@ -261,14 +378,12 @@ def recaptcha_solver():
     # USE PROPER PROXY SOFTWARE LIKE SQUID !
     # INSTALLATION INSTRUCTIONS:
     # https://anti-captcha.com/apidoc/articles/how-to-install-squid
-    solver.set_proxy_address("5.75.228.227")
-    solver.set_proxy_port(9123)
-    solver.set_proxy_login("mylogin")
-    solver.set_proxy_password("mypassword")
-    solver.set_user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
-    solver.set_cookies("test=true")
-
-   
+    # solver.set_proxy_address("91.107.220.223")
+    # solver.set_proxy_port(443)
+    # solver.set_proxy_login("mylogin")
+    # solver.set_proxy_password("mypassword")
+    # solver.set_user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+    # solver.set_cookies("test=true")
 
     g_response = solver.solve_and_return_solution()
     if g_response != 0:
@@ -276,19 +391,21 @@ def recaptcha_solver():
     else:
         logging.info("task finished with error" + solver.error_code)
 
-
-
-    time.sleep(20)
-    browser.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display-"";')
-    time.sleep(1)
+    browser.execute_script('''
+    var element = document.getElementById("g-recaptcha-response");
+    var style = element.getAttribute("style");
+    style = style.replace("display: none;", "/* display: none; */");
+    element.setAttribute("style", style);
+    ''')
+    #browser.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
+    #time.sleep(30)
     browser.execute_script("""document.getElementById("g-recaptcha-response").innerHTML = arguments[0]""", g_response)
-    time.sleep(1)
+    #time.sleep(10)
     browser.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
-    time.sleep(1)
-    # browser.find_element(By.XPATH, '//*[@id="recaptcha-demo-submit"]').click()
+    #time.sleep(10)
+    # browser.find_ele-ment(By.XPATH, '//*[@id="recaptcha-demo-submit"]').click()
 
-
-def date_time_selection(arg1, arg2):
+def date_time_selection(arg1, arg2, arg3, arg4, arg5):
     # time.sleep(2)
     global option
     try:
@@ -297,12 +414,23 @@ def date_time_selection(arg1, arg2):
         select_month = browser.find_element(By.XPATH, '//*[@id="xi-div-2"]/div/div[1]/div/div/span')
         browser.implicitly_wait(3)
         logging.info(f'The selected date is {select_day.text} {select_month.text} day of the month')
-        #select_day.click() in comment shod choon gharar nist automatic book beshe
+       
+        if not select_month.text == arg3:
+            logging.info(f"The month of {arg3} was not found in the findings")
+            if not select_month.text == arg4:
+                logging.info(f"The month of {arg4} was not found in the findings")
+                if not select_month.text == arg5:
+                    logging.info(f"The month of {arg5} was not found in the findings")
+                    logging.info('++The available date is not in the selected months++')
+                    raise NoSuchElementException 
+        select_day.click() 
+                
     except NoSuchElementException:
         logging.info('We got to the date selection page, but unfortunately there are no dates to choose from.')
-        browser.quit()
-        open_browser()
-        main_process()
+        raise NoSuchElementException 
+        # browser.quit()
+        # open_browser()
+        # main_process()
 
     dropdown_menu_is_open = browser.find_element(By.XPATH,
                                                  '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[1]/div[2]/div[1]/div[2]/div[1]/div[2]/div[4]/div[1]/fieldset[1]/div[1]/select[1]')
@@ -326,10 +454,9 @@ def date_time_selection(arg1, arg2):
             break
 
     logging.info(f'Selected booking time is {option.text}')
-    #dropdown_menu.select_by_visible_text(option.text) in comment shod choon gharar nist automatic book beshe
+    dropdown_menu.select_by_visible_text(option.text) # in comment shod choon gharar nist automatic book beshe
 
-    # Recaptcha
-    #recaptcha_solver()
+
     get_url = browser.current_url
     user_data = (
     f'''
@@ -346,20 +473,28 @@ ID Card Number: ```{id_card_number}```'''
     
 
     url = f'[Appointment is available | Click to Book]({get_url})'
-    send_message_to_admin(group_chat_id, url)
-    send_message_to_admin(group_chat_id, user_data)
+    send_message_to_telegram(group_chat_id, url)
+    send_message_to_telegram(group_chat_id, user_data)
 
-    # time.sleep(60)
-    # browser.implicitly_wait(3)
-    # next_button = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
-    # next_button.click()
+    logging.info(send_screenshot_to_telegram_channel(channel_chat_id, 'xi-div-1', message_in_channel))
 
 
-def import_personal_data(arg1, arg2, arg3, arg4, arg5):
-    # print('wait till 15 min')
-    # time.sleep(15)
-    # print('finished')
-    WebDriverWait(browser, 360).until(EC.text_to_be_present_in_element((By.XPATH,
+    # Recaptcha
+    recaptcha_solver()
+
+    browser.implicitly_wait(3)
+    next_button = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
+    next_button.click()
+
+    time.sleep(7)
+    browser.implicitly_wait(3)
+    messagebox = browser.find_element(By.ID, 'messagesBox')
+    logging.warning(messagebox.text)
+
+
+def import_personal_data(arg1, arg2, arg3, arg4, arg5, arg6):
+
+    WebDriverWait(browser, 120).until(EC.text_to_be_present_in_element((By.XPATH,
                                                                        '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[1]/div[2]/div[1]/div[2]/div[1]/div[2]/div[3]/div[1]/fieldset[1]/div[1]/div[1]/label[1]/p[1]'),
                                                                       'First name*'))
     # test_1 = browser.find_element(By.XPATH, '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[1]/div[2]/div[1]/div[2]/div[1]/div[2]/div[3]/div[1]/fieldset[1]/div[1]/div[1]/label[1]/p[1]')
@@ -370,8 +505,10 @@ def import_personal_data(arg1, arg2, arg3, arg4, arg5):
     lastname = browser.find_element(By.ID, 'xi-tf-4')
     dob = browser.find_element(By.ID, 'xi-tf-5')
     email = browser.find_element(By.ID, 'xi-tf-6')
-    # question_field_1 = browser.find_element(By.ID, 'xi-sel-2')
-    ausweisnummer = browser.find_element(By.ID, 'xi-tf-21')
+    if arg6 == 'Apply for a residence title':
+        element_dropdown = Select(browser.find_element(By.ID, 'xi-sel-2'))       
+    elif arg6 == 'Extend a residence title':
+        ausweisnummer = browser.find_element(By.ID, 'xi-tf-21')
 
     firstname.send_keys(arg1)
     logging.info(arg1)
@@ -381,22 +518,48 @@ def import_personal_data(arg1, arg2, arg3, arg4, arg5):
     logging.info(arg3)
     email.send_keys(arg4)
     logging.info(arg4)
-    ausweisnummer.send_keys(arg5)
-    logging.info(arg5)
-    # element_dropdown = Select(browser.find_element(By.ID, 'xi-sel-2'))
-    # element_dropdown.select_by_visible_text('no')
-    time.sleep(10)
+    if arg6 == 'Apply for a residence title': 
+        element_dropdown.select_by_visible_text('no') 
+        logging.info('no')  
+    elif arg6 == 'Extend a residence title':
+        ausweisnummer.send_keys(arg5)
+        logging.info(arg5)
+
     browser.implicitly_wait(3)
     next_button = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
     next_button.click()
 
-    # browser.implicitly_wait(50)
-    # submit_button = browser.find_element(By.ID, 'summaryForm:proceed')
-    # submit_button.click()
+    WebDriverWait(browser, 120).until(EC.text_to_be_present_in_element((By.XPATH,
+                                                                       '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[2]/div[2]/div[1]/div[2]/div[1]/div[1]/fieldset[1]/legend[1]'),
+                                                                      'Appointment booking - Please check your data'))
+    browser.implicitly_wait(1)
+    is_check_data_page = browser.find_element(By.XPATH, '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[2]/div[2]/div[1]/div[2]/div[1]/div[1]/fieldset[1]/legend[1]')
+    logging.info(is_check_data_page.text)
+
+    browser.implicitly_wait(50)
+    submit_button = browser.find_element(By.ID, 'summaryForm:proceed')
+    submit_button.click()
+    logging.info('FINAL SUBMIT | clicked')
+
+    time.sleep(10)
 
 
+    # Find the element by its class
+    pdf_link = browser.find_element(By.CLASS_NAME, 'btnApplicationPdf').get_attribute('href')
+    logging.info('PDF LINK ' + pdf_link)
 
+    user_data = (
+    f'''
+Firstname: ```{arg1}``` 
 
+Lastname: ```{arg2}```'''
+    )
+    
+
+    url = f'[ PDF | Click to Download]({pdf_link})'
+    send_message_to_telegram(group_chat_id, url)
+    send_message_to_telegram(group_chat_id, user_data)
+    logging.info('PDF link has been sent to Telegram group')
 
 
 # # bot receives all updates
@@ -407,7 +570,7 @@ def import_personal_data(arg1, arg2, arg3, arg4, arg5):
 
 
 # Example usage
-is_loop = 'true'
+
 while is_loop == 'true':
     try:
         open_browser()
@@ -415,9 +578,9 @@ while is_loop == 'true':
         nationality_selection(citizenship, nr_applicants, with_family_live, family_citizenship)
         select_type_of_residency(residence_title, category, request_type)
         service_selection()
-        date_time_selection(booking_time_offer_1, booking_time_offer_2)
+        date_time_selection(booking_time_offer_1, booking_time_offer_2, booking_month_1st, booking_month_2nd, booking_month_3rd)
         is_loop = 'false'
-        import_personal_data(firstname, lastname, dob, email, id_card_number)
+        import_personal_data(firstname, lastname, dob, email, id_card_number, residence_title)
         is_loop = 'false'
     except Exception as e:
         # The error handler function will be automatically called here
@@ -431,4 +594,7 @@ while is_loop == 'true':
         browser.quit()
         pass  # Or you can choose to handle the error further if needed
 
-logging.info('--Congratulations! your booking has been done successfully--')
+if final_status == 'true': 
+    logging.info('--Congratulations! your booking has been done successfully--')
+else:
+   logging.info('--We are out of hours and there are no appointments to book--') 
