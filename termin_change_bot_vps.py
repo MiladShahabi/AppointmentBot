@@ -70,30 +70,32 @@ option.add_argument("--disable-popup-blocking")
 browser = None
 service_path = None
 
-booking_time_offer_1 = '09:30'
-booking_time_offer_2 = '13:30'
+booking_time_offer_1 = '08:30'
+booking_time_offer_2 = '14:00'
 
-booking_month_1st = 'October'
-booking_month_2nd = 'November'
-booking_month_3rd = 'December'
+booking_month_1st = 'December'
+booking_month_2nd = 'December'
+booking_month_3rd = 'January'
 
-prefered_start_day = 9 # October
-prefered_end_day = 31 # October
+prefered_start_day = 1 # November
+prefered_end_day = 30 # November
 prefered_day = 'on' # off/on
 
-USER_CHAT_ID: Final = 6619503977  # User's Chat ID
-firstname = 'Luciana'
-lastname = 'Bassallo Gonzalez'
-dob = '13.02.2002' # DD.MM.YYYY
-process_number = '140480'
-change_number = '7858'
+USER_CHAT_ID: Final = 1112294786  # User's Chat ID
+firstname = 'Harshit'
+lastname = 'Kumar'
+dob = '28.03.1997' # DD.MM.YYYY
+process_number = '213062'
+change_number = '6da8'
 
 
 
 i = 0
 is_loop = 'true'
+block_condition = 0
+is_block = False
 is_solvedCaptcha = False
-final_status = True
+final_status = False
 emoji_check_mark = u'\U00002705'
 emoji_thanks = u'\U0001F64F'
 emoji_bot = u'\U0001F916'
@@ -137,6 +139,12 @@ def send_screenshot_to_telegram_channel(chat_id, snapshot_area, text):
 def open_browser():
     global browser
     global service_path
+    global is_block
+    global block_condition
+
+    block_condition += 1
+    if block_condition > 3:
+        is_block = True
     # terminal_text = colored('Open Browser function, executed', 'green', attrs=['bold'])
     # print(terminal_text)
     logging.info('Open Browser function, executed')
@@ -146,6 +154,9 @@ def open_browser():
     browser.get("https://otv.verwalt-berlin.de/ams/TerminBuchen?lang=en")
 
 def main_process():
+    global is_block
+    global block_condition
+
     logging.info('Waiting for Book Appointment btn ...')
     WebDriverWait(browser, 20).until(
         EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'a[href="/ams/TerminAendern/wizardng?sprachauswahl=en"]'), 
@@ -153,6 +164,9 @@ def main_process():
     browser.implicitly_wait(3)
     browser.find_element(By.CSS_SELECTOR, 'a[href="/ams/TerminAendern/wizardng?sprachauswahl=en"]').click()
     logging.info('Change Appointment btn passed')
+
+    block_condition = 0 # Reset
+    is_block = False # loop continue
 
     #======================================================================================================================
 
@@ -290,7 +304,7 @@ def date_time_selection(arg1, arg2, arg3, arg4, arg5, start, stop, arg8, arg9, a
     submit_button = browser.find_element(By.ID, 'summaryForm:proceed')
     submit_button.click()
     logging.info('FINAL SUBMIT | clicked')
-    final_status == True
+    final_status = True
 
     time.sleep(5)
 
@@ -354,7 +368,7 @@ while is_loop == 'true':
         # print(f"Unfortunately the Date is unavailable\nRepeated", {i}, "times")
         logging.warning('Unfortunately the Date is unavailable')
         logging.info(f'{i} attempts')
-        if i > 500:
+        if i > 800 or is_block == True:
             is_loop = 'false'
             bot_status_msg = (f'The Bot is out of service ({firstname})')
             logging.info(bot_status_msg)
@@ -380,9 +394,10 @@ if final_status == True:
         if i == random_value:
             if only_once == True:
                 payment_request_msg = (f'''Hi {firstname} {lastname},                     
-You can transfer the 50 Euros fee via this PayPal link.
+You can transfer the 50 euro fee for changing the date through the following account information and also send the related screenshot to the @GetMyTermin_Admin Telegram ID to confirm your payment.
 {point_down}{point_down}{point_down}
-https://www.paypal.me/GetMyTerminDE''')
+IBAN : LT703250013955496479
+Account Holder Name : GetMyTermin''')
                 send_message_to_user(USER_CHAT_ID, payment_request_msg, bot_token_getmytermin)
                 send_message_to_user(ADMIN_USER_ID, payment_request_msg, bot_token_getmytermin)
                 only_once = False

@@ -1,7 +1,7 @@
 import sys
 import time
 import telebot
-import websocket
+import random
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
@@ -54,8 +54,8 @@ option.page_load_strategy = 'normal'
 option.add_argument("--start-maximized")
 # option.add_argument("--window-size=4320,7680") # we use it only for screenshot 
 option.add_argument("--remote-debugging-port=9222")  # Use an arbitrary port number
-option.add_experimental_option("detach", True)  # Keep the browser window open after exiting the script
-option.add_argument('--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"')
+option.add_experimental_option("detach", False)  # Keep the browser window open after exiting the script
+option.add_argument('--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"')
 
 # Removes navigator.webdriver flag
 
@@ -102,14 +102,16 @@ request_type = "EU Blue Card / Blaue Karte EU (sect. 18b para. 2)"
 find_month = ''
 find_day = ''
 i = 0
-is_loop = 'true'
+block_condition = 0
+is_block = False
 is_solvedCaptcha = False
-final_status = 'true'
+is_loop = 'true'
+final_status = False
 emoji_check_mark = u'\U00002705'
 emoji_thanks = u'\U0001F64F'
-point_down = u'\U0001f447'
 emoji_bot = u'\U0001F916'
 at = u'\U00000040'
+point_down = u'\U0001f447'
 
 
 message_in_channel = (f'''{emoji_check_mark} Appointment available
@@ -163,6 +165,12 @@ def send_screenshot_to_telegram_channel(chat_id, snapshot_area, text):
 def open_browser():
     global browser
     global service_path
+    global is_block
+    global block_condition
+
+    block_condition += 1
+    if block_condition > 3:
+        is_block = True
     # terminal_text = colored('Open Browser function, executed', 'green', attrs=['bold'])
     # print(terminal_text)
     logging.info('Open Browser function, executed')
@@ -173,6 +181,9 @@ def open_browser():
     
 
 def main_process():
+    global is_block
+    global block_condition
+
     logging.info('Waiting for Book Appointment btn ...')
     WebDriverWait(browser, 20).until(
         EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'a[href="/ams/TerminBuchen/wizardng?sprachauswahl=en"]'),
@@ -180,6 +191,9 @@ def main_process():
     browser.implicitly_wait(3)
     browser.find_element(By.CSS_SELECTOR, 'a[href="/ams/TerminBuchen/wizardng?sprachauswahl=en"]').click()
     logging.info('Book Appointment btn passed')
+
+    block_condition = 0 # Reset
+    is_block = False # loop continue
 
     # Mark checkbox and Next Buttom 
     browser.implicitly_wait(30)
@@ -302,15 +316,17 @@ def select_type_of_residency(arg1, arg2, arg3):
     next_btn.click()
     logging.info('Next buttom Clicked')
     try:
-        WebDriverWait(browser, 30).until(
+        WebDriverWait(browser, 50).until(
         EC.text_to_be_present_in_element(
             (By.CSS_SELECTOR, "fieldset[id='xi-fs-2'] legend"), 'Appointment selection')
         )
-    except:    
+    except:
+        logging.info('There are currently no dates available for the selected service! Please try again later.')
         # raise NoSuchElementException
         count = 0
         date_not_availale = 'true'
         while date_not_availale == 'true':
+            logging.info('is_loading_start_inloop')
             next_btn = browser.find_element(By.ID, 'applicationForm:managedForm:proceed')
             next_btn.click()
             logging.info('Next buttom Clicked')
@@ -318,12 +334,10 @@ def select_type_of_residency(arg1, arg2, arg3):
             if count > 10:
                 raise NoSuchElementException
             logging.info(f'try count: {count}')
-            logging.info('is_loading_start_inloop')
             wait = WebDriverWait(browser, 60)
             wait.until_not(EC.visibility_of_element_located((By.CLASS_NAME, "loading")))
             logging.info('is_loading_end_inloop')
             try:
-                logging.info('before page specify')
                 WebDriverWait(browser, 5).until(
                     EC.text_to_be_present_in_element(
                         (By.XPATH, '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[1]/div[2]/div[1]/div[2]/div[8]/div[2]/div[2]/div[1]/fieldset[1]/legend[1]'), 'Information about the concern')
@@ -406,9 +420,10 @@ def recaptcha_solver():
 def date_time_selection(arg1, arg2, arg3, arg4, arg5, start, stop, arg8):
     # time.sleep(2)
     global option
-    global find_month
     global find_day
+    global find_month
     global is_solvedCaptcha
+    global allow_channel_notifications
 
     try:
         browser.implicitly_wait(3)
@@ -427,7 +442,7 @@ def date_time_selection(arg1, arg2, arg3, arg4, arg5, start, stop, arg8):
                     logging.info(f"The month of {arg5} was not found in the findings")
                     logging.info('++The available date is not in the selected months++')
                     raise NoSuchElementException 
-        if not arg8 == 'select':
+        if not arg8 == 'off':
             if not stop >= int(select_day.text) >= start:   
                 logging.warning('-->>>The founded slot is not in range to the preferred selected dates<<<--')
                 raise NoSuchElementException
@@ -446,7 +461,7 @@ def date_time_selection(arg1, arg2, arg3, arg4, arg5, start, stop, arg8):
     # try:
     for i in range(600):  # Create Time Delay for open the page complete
         if not (dropdown_menu_is_open.text == 'Please select'):
-            logging.info(f'The (Time selection) part is loaded completely now. After {i * 0.1} Second')
+            logging.info(f'The (Time selection) part is loaded completely now. /*_*_*/')
             break
         else:
             logging.info(i)
@@ -486,8 +501,8 @@ def date_time_selection(arg1, arg2, arg3, arg4, arg5, start, stop, arg8):
 #     url = f'[Appointment is available | Click to Book]({get_url})'
 #     send_message_to_telegram(group_chat_id, url)
 #     send_message_to_telegram(group_chat_id, user_data)
-
-    #logging.info(send_screenshot_to_telegram_channel(channel_chat_id, 'xi-div-1', message_in_channel))
+    if allow_channel_notifications == True:
+        logging.info(send_screenshot_to_telegram_channel(channel_chat_id, 'xi-div-1', message_in_channel))
 
     # Recaptcha
     recaptcha_solver()
@@ -507,8 +522,9 @@ def import_personal_data(arg1, arg2, arg3, arg4, arg5, arg6, arg7):
 
     global find_day
     global find_month
+    global final_status
 
-    WebDriverWait(browser, 360).until(EC.text_to_be_present_in_element((By.XPATH,
+    WebDriverWait(browser, 150).until(EC.text_to_be_present_in_element((By.XPATH,
                                                                        '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[1]/div[2]/div[1]/div[2]/div[1]/div[2]/div[3]/div[1]/fieldset[1]/div[1]/div[1]/label[1]/p[1]'),
                                                                       'First name*'))
     # test_1 = browser.find_element(By.XPATH, '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[1]/div[2]/div[1]/div[2]/div[1]/div[2]/div[3]/div[1]/fieldset[1]/div[1]/div[1]/label[1]/p[1]')
@@ -555,12 +571,13 @@ def import_personal_data(arg1, arg2, arg3, arg4, arg5, arg6, arg7):
     is_check_data_page = browser.find_element(By.XPATH, '/html[1]/body[1]/div[2]/div[2]/div[4]/div[2]/form[2]/div[2]/div[1]/div[2]/div[1]/div[1]/fieldset[1]/legend[1]')
     logging.info(is_check_data_page.text)
 
-    # browser.implicitly_wait(100)
-    # submit_button = browser.find_element(By.ID, 'summaryForm:proceed')
-    # submit_button.click()
-    # logging.info('FINAL SUBMIT | clicked')
+    browser.implicitly_wait(50)
+    submit_button = browser.find_element(By.ID, 'summaryForm:proceed')
+    submit_button.click()
+    logging.info('FINAL SUBMIT | clicked')
+    final_status = True
 
-    time.sleep(10)
+    time.sleep(5)
 
 
     # Find the element by its class
@@ -569,9 +586,9 @@ def import_personal_data(arg1, arg2, arg3, arg4, arg5, arg6, arg7):
 
     user_data = (
     f'''
-Firstname: {arg1} 
+Firstname: ```{arg1}``` 
 
-Lastname: {arg2}'''
+Lastname: ```{arg2}```'''
     )
     
 
@@ -626,12 +643,23 @@ while is_loop == 'true':
         i += 1
 
         if is_solvedCaptcha:
-            logging.info(send_screenshot_to_telegram_channel(group_chat_id, 'main', 'Unsuccessful try'))
+            user_data_2 = (
+    f'''
+Faild attempt
+Firstname: ```{firstname}```
+Lastname: ```{lastname}```'''
+    )
+            logging.info(send_screenshot_to_telegram_channel(group_chat_id, 'main', user_data_2))
             is_solvedCaptchaError = False
 
         # print(f"Unfortunately the Date is unavailable\nRepeated", {i}, "times")
         logging.warning('Unfortunately the Date is unavailable')
         logging.info(f'{i} attempts')
+        if i > 800 or is_block == True:
+            is_loop = 'false'
+            bot_status_msg = (f'The Bot is out of service ({firstname})')
+            logging.info(bot_status_msg)
+            bot.send_message(group_chat_id, bot_status_msg)
         # Repeated", {i}, "times"
         # logging.error('Something bad happened')
         # is_loop = 'false'
@@ -639,7 +667,30 @@ while is_loop == 'true':
         browser.quit()
         pass  # Or you can choose to handle the error further if needed
 
-if final_status == 'true': 
+if final_status == True: 
+    final_status = False
+    only_once = True
     logging.info('--Congratulations! your booking has been done successfully--')
+    i = 0
+    random.seed()
+    random_value = random.randrange(2, 5)
+    while True:
+        time.sleep(15) # each step is 15 second
+        i += 1
+        if i == random_value:
+            if only_once == True:
+                payment_request_msg = (f'''Hi {firstname} {lastname},                    
+You can transfer 50 euros through the following account information and also send the related screenshot to the @GetMyTermin_Admin Telegram ID to confirm your payment.
+{point_down}{point_down}{point_down}
+IBAN : BE16967465727274
+Account Holder Name : GetMyTermin''')
+                send_message_to_user(USER_CHAT_ID, payment_request_msg, bot_token_getmytermin)
+                send_message_to_user(ADMIN_USER_ID, payment_request_msg, bot_token_getmytermin)
+                only_once = False
+        if i == 240: # 240 step is equal to 1 minute -> 240x15=3600
+            i = 0
+            bot_status_msg = (f"I'm still running please stop me so you can have more resources for other bots!\n++TASK NAME is: ({firstname})")
+            logging.info(bot_status_msg)
+            bot.send_message(group_chat_id, bot_status_msg)
 else:
    logging.info('--We are out of hours and there are no appointments to book--') 

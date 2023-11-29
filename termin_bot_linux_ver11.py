@@ -77,32 +77,32 @@ browser = None
 service_path = None
 
 
-booking_time_offer_1 = '09:30'
-booking_time_offer_2 = '11:00'
+booking_time_offer_1 = '08:30'
+booking_time_offer_2 = '14:00'
 
-booking_month_1st = 'September'
-booking_month_2nd = 'October'
-booking_month_3rd = 'November'
+booking_month_1st = 'December'
+booking_month_2nd = 'December'
+booking_month_3rd = 'January'
 
-prefered_start_day = 1 # September
-prefered_end_day = 31 # September
+prefered_start_day = 1 # November
+prefered_end_day = 30 # November
 prefered_day = 'on' # off/on
 
-allow_channel_notifications = True # True
-USER_CHAT_ID: Final = 70182772  # User's Chat ID
-firstname = 'Elham'
-lastname = 'Javadifar'
-dob = '01.09.1984' # DD.MM.YYYY
-email = 'ejavadifar2012@gmail.com'
-citizenship = "Iran, Islamic Republic"
-nr_applicants = 'four people'
-with_family_live = 'yes'
-family_citizenship = 'Iran, Islamic Republic'
-residence_title = "Extend a residence title"
-currently_have_a_residence = 'no' # If selected Extend this item should be set 'no'
-id_card_number = 'Z59581931'
+allow_channel_notifications = False # True
+USER_CHAT_ID: Final = 6143797372  # User's Chat ID
+firstname = 'Maria Agustina'
+lastname = 'Abdala'
+dob = '29.11.1993' # DD.MM.YYYY
+email = 'magustina.abdala@gmail.com'
+citizenship = "Argentina"
+nr_applicants = 'one person'
+with_family_live = 'no'
+family_citizenship = 'None'
+residence_title = "Apply for a residence title"
+currently_have_a_residence = 'yes' # If selected Extend this item should be set 'no'
+id_card_number = '066581438'
 category = "Educational purposes"
-request_type = "Residence permit for the purpose of studying (sect. 16b)"
+request_type = "Residence permit for study preparation (sect. 16b para. 1)"
 
 
 
@@ -661,7 +661,7 @@ Lastname: ```{lastname}```'''
         logging.info(f'{i} attempts')
         if i > 800 or is_block == True:
             is_loop = 'false'
-            bot_status_msg = (f'The Bot is out of service ({firstname})_3')
+            bot_status_msg = (f'The Bot is out of service ({firstname})')
             logging.info(bot_status_msg)
             bot.send_message(group_chat_id, bot_status_msg)
         # Repeated", {i}, "times"
@@ -685,9 +685,10 @@ if final_status == True:
         if i == random_value:
             if only_once == True:
                 payment_request_msg = (f'''Hi {firstname} {lastname},                     
-You can transfer the 50 Euros fee via this PayPal link.
+You can transfer 50 euros through the following account information and also send the related screenshot to the @GetMyTermin_Admin Telegram ID to confirm your payment.
 {point_down}{point_down}{point_down}
-https://www.paypal.me/GetMyTerminDE''')
+IBAN : BE16967465727274
+Account Holder Name : GetMyTermin''')
                 send_message_to_user(USER_CHAT_ID, payment_request_msg, bot_token_getmytermin)
                 send_message_to_user(ADMIN_USER_ID, payment_request_msg, bot_token_getmytermin)
                 only_once = False
